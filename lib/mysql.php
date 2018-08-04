@@ -160,8 +160,9 @@ function rawQuery($query)
 		if($debugMode)
 		{
 			$bt = "";
-			if(function_exists("backTrace"))
+			if(function_exists("backTrace")) {
 				$bt = backTrace();
+			}
 			echo (nl2br($bt).
 				"<br><br>".htmlspecialchars($theError).
 				"<br><br>Query was: <code>".htmlspecialchars($query)."</code>");
@@ -244,7 +245,7 @@ function getDataPrefix($data, $pref)
 
 
 $fieldLists = array(
-	"userfields" => "id,name,displayname,powerlevel,sex,minipic,karma"
+	"userfields" => "id,name,displayname,powerlevel,colorset,pronouns,minipic,karma"
 );
 
 $tableLists = array(

@@ -127,7 +127,28 @@ $profileParts = array();
 $foo = array();
 $foo[__("Name")] = $minipic . htmlspecialchars($user['displayname'] ? $user['displayname']." (".$user['name'].")" : $user['name']);
 $foo[__("Power")] = getPowerlevelName($user['powerlevel']);
-$foo[__("Sex")] = getSexName($user['sex']);
+if ($user['gender'] != "N/A") {
+	$foo[__("Gender")] = $user['gender'];
+}
+if ($user['pronouns'] != "") {
+	$pronouns = explode("/", $user['pronouns']);
+	$foo[__("Pronouns")] = $pronouns[0] . "/" . $pronouns[1];
+	if (!array_key_exists($user['pronouns'], $defaultPronouns)) {
+		$foo[__("Pronouns")] .= format(
+			'<div class="spoiler" style="display: inline;">
+				<button class="spoilerbutton named">{0}</button>
+				<div class="spoiled hidden">
+					{6} went to the park.<br />
+					I went with {2}.<br />
+					{6} brought {3} frisbee.<br />
+					At least I think it was {4}.<br />
+					{6} threw it to {5}.
+				</div>
+			</div>',
+			__("Show usage"), $pronouns[0], $pronouns[1], $pronouns[2], $pronouns[3], $pronouns[4], ucfirst($pronouns[0])
+		);
+	}
+}
 if($title)
 	$foo[__("Title")] = $title;
 if($currentRank)

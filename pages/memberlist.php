@@ -58,7 +58,6 @@ if ($_GET['listing'])
 	if(!in_array($sort, array('', 'id', 'name', 'karma', 'reg')))
 		unset($sort);
 
-	$sex = $_GET['sex'];
 	if(isset($_GET['pow']) && $_GET['pow'] != "")
 		$pow = (int)$_GET['pow'];
 
@@ -74,14 +73,7 @@ if ($_GET['listing'])
 		default: $order="posts ".(isset($dir) ? $dir : "desc");
 	}
 
-	switch($sex)
-	{
-		case "m": $where = "sex=0"; break;
-		case "f": $where = "sex=1"; break;
-		case "n": $where = "sex=2"; break;
-		default: $where = "1";
-	}
-
+	$where = "1";
 	if(isset($pow))
 		$where.= " and powerlevel={2}";
 
@@ -234,15 +226,6 @@ if (!$isBot)
 		".makeSelect("order", array(
 			"desc" => __("Descending"),
 			"asc" => __("Ascending"),
-		))." &nbsp;
-		</label>
-		<label>
-		".__("Sex").":
-		".makeSelect("sex", array(
-			"" => __("(any)"),
-			"n" => __("N/A"),
-			"f" => __("Female"),
-			"m" => __("Male")
 		))." &nbsp;
 		</label>
 		<label>

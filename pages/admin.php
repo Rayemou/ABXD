@@ -70,6 +70,7 @@ cell2(actionLinkTag(__("Edit smilies"), "editsmilies"));
 cell2(actionLinkTag(__("Optimize tables"), "optimize"));
 cell2(actionLinkTag(__("View log"), "log"));
 cell2(actionLinkTag(__("Update table structure"), "updateschema"));
+cell2(actionLinkTag(__("Migrate genders"), "migrategenders"));
 
 $bucket = "adminleft"; include("./lib/pluginloader.php");
 

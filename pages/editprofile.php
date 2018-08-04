@@ -49,8 +49,13 @@ foreach($dateformats as $format)
 foreach($timeformats as $format)
 	$timelist[$format] = ($format ? $format.' ('.cdate($format).')':'');
 
-$sexes = array(__("Male"), __("Female"), __("N/A"));
 $powerlevels = array(-1 => __("-1 - Banned"), __("0 - Normal user"), __("1 - Local Mod"), __("2 - Full Mod"), __("3 - Admin"));
+$colorValues = array();
+$dispname = $user['displayname'] ? $user['displayname'] : $user['name'];
+
+for ($i = 0; $i < 3; $i++) {
+	$colorValues[] = "<span class=\"nc$i" . $user['powerlevel'] . "\">" . $dispname . "</span>";
+}
 
 //Editprofile.php: Welcome to the Hell of Nested Arrays!
 $general = array(
@@ -76,6 +81,11 @@ $general = array(
 				"width" => "98%",
 				"length" => 255,
 			),
+			"colorset" => array(
+				"caption" => __("Name color"),
+				"type" => "radiogroup",
+				"options" => $colorValues
+			)
 		),
 	),
 	"avatar" => array(
@@ -149,10 +159,14 @@ $personal = array(
 	"personal" => array(
 		"name" => __("Personal information"),
 		"items" => array(
-			"sex" => array(
-				"caption" => __("Sex"),
-				"type" => "radiogroup",
-				"options" => $sexes,
+			"gender" => array(
+				"caption" => __("Gender"),
+				"type" => "gender"
+			),
+			"pronouns" => array(
+				"caption" => __("Pronouns"),
+				"type" => "pronouns",
+				"callback" => "handlePronouns"
 			),
 			"realname" => array(
 				"caption" => __("Real name"),
@@ -499,6 +513,34 @@ if($_POST['action'] == __("Edit profile"))
 						$sets[] = $field." = ".$val;
 						break;
 
+					case 'gender':
+						$gender = "N/A";
+						if ($_POST[$field] == "Custom" && trim($_POST[$field . '_custom']) != "") {
+							$gender = $_POST[$field . "_custom"];
+						} else if (trim($_POST[$field]) != "") {
+							$gender = $_POST[$field];
+						}
+						$sets[] = $field . " = \"" . sqlEscape($gender) . "\"";
+						break;
+
+					case 'pronouns':
+						$pronouns = "";
+						if (array_key_exists($_POST[$field], $defaultPronouns)) {
+							$pronouns = $_POST[$field];
+						} else if ($_POST[$field] == "custom") {
+							$pronouns =
+								$_POST[$field . "_0"] . "/" .
+								$_POST[$field . "_1"] . "/" .
+								$_POST[$field . "_2"] . "/" .
+								$_POST[$field . "_3"] . "/" .
+								$_POST[$field . "_4"];
+						} else {
+							$pronouns = "";
+						}
+						$sets[] = $field . " = \"" . sqlEscape($pronouns) . "\"";
+						break;
+
+
 					//TODO: These two are copypasta, fixit
 					case "displaypic":
 						if($_POST['remove'.$field])
@@ -604,6 +646,21 @@ unset($tab);
 
 if($failed)
 	$loguser['theme'] = $_POST['theme'];
+
+function handlePronouns($field, $item) {
+	global $defaultPronouns;
+
+	if ($_POST[$field] == "custom") {
+		for ($i = 0; $i < 5; $i++) {
+			if (trim($_POST[$field . "_" . $i]) == "")
+				return "You must fill out all the fields for pronouns.";
+			else if (strpos($_POST[$field."_".$i], '/') !== false)
+				return "You can not use slashes in your pronouns.";
+		}
+	} else if ($_POST[$field] != "N/A" && !array_key_exists($_POST[$field], $defaultPronouns)) {
+		return "Did you mean to select custom pronouns?";
+	}
+}
 
 function HandlePicture($field, $type, $errorname, $allowOversize = false)
 {
@@ -988,7 +1045,7 @@ Write(
 
 function BuildPage($page, $id)
 {
-	global $selectedTab, $loguser;
+	global $selectedTab, $loguser, $user, $defaultPronouns, $defaultGenders;
 
 	//TODO: This should be done in JS.
 	//So that a user who doesn't have Javascript will see all the tabs.
@@ -1098,6 +1155,54 @@ function BuildPage($page, $id)
 					$output .= "<input type=\"text\" name=\"".$field."H\" size=\"2\" maxlength=\"3\" value=\"".(int)($item['value']/3600)."\" />\n";
 					$output .= ":\n";
 					$output .= "<input type=\"text\" name=\"".$field."M\" size=\"2\" maxlength=\"3\" value=\"".floor(abs($item['value']/60)%60)."\" />";
+					break;
+				case 'gender':
+					foreach ($defaultGenders as $k => $v) {
+						$output .= format(
+							'<label><input type="radio" name="{0}" value="{1}" {2}/>{3}</label> ',
+							$field, $k, trim($item['value']) == $k ? "checked=\"checked\"" : "", $v
+						);
+					}
+					$isDefault = array_key_exists(trim($item['value']), $defaultGenders); 
+					$output .= format(
+						'<br /><label><input type="radio" name="{0}" value="Custom" {1}/>Other</label> <input type="text" name="{0}_custom" value="{2}" size="32" />',
+						$field, $isDefault ? "" : "checked=\"checked\" ", $isDefault ? "" : $item['value']
+					);
+					break;
+
+				case 'pronouns':
+					$output .= format(
+						'<label><input type="radio" name="{0}" value="N/A" {1} />{2}</label>',
+						$field, trim($item['value']) == "" || trim($item['value']) == "N/A" ? "checked=\"checked\"" : "", __("N/A")
+					);
+
+					foreach ($defaultPronouns as $k => $v) {
+						$output .= format(
+							'<label><input type="radio" name="{0}" value="{1}" {2} />{3}</label>',
+							$field, $k, $item['value'] == $k ? "checked=\"checked\"" : "", $v
+						);
+					}
+
+					if (trim($item['value']) == "") {
+						$isCustom = false;
+					} else {
+						$isCustom = !array_key_exists($item['value'], $defaultPronouns);
+					}
+					$pronouns = $isCustom && $item['value'] != "custom" ? explode("/", $item['value']) : array();
+
+					$output .= format(
+						'<br /><label><input type="radio" name="{0}" value="custom" {1} />{2}</label> ',
+						$field, $isCustom ? "checked=\"checked\"" : "", __("Custom")
+					);
+					$example = array("they", "them", "their", "theirs", "themself");
+					foreach ($example as $i => $ex) {
+						$output .= format(
+							'<input type="text" name="{0}_{1}" size="5" placeholder="{2}" value="{3}" />',
+							$field, $i, $ex, $_POST[$field . "_" . $i] ? $_POST[$field . "_" . $i] : $pronouns[$i]
+						);
+						if ($i != count($example) - 1)
+							$output .= "/";
+					}
 					break;
 			}
 			if(isset($item['extra']))

@@ -49,15 +49,6 @@ function Plural($i, $s)
 	return $i." ".$s;
 }
 
-function HisHer($user)
-{
-	if($user['sex'] == 0)
-		return "his";
-	if($user['sex'] == 1)
-		return "her";
-	return "their";
-}
-
 function stringtotimestamp($str)
 {
 	global $months;

@@ -136,10 +136,11 @@ function userLink($user, $showMinipic = false, $customID = false)
 	$bucket = "userMangler"; include("./lib/pluginloader.php");
 
 	$fpow = $user['powerlevel'];
-	$fsex = $user['sex'];
+	$fcolor = $user['colorset'];
 	$fname = ($user['displayname'] ? $user['displayname'] : $user['name']);
 	$fname = htmlspecialchars($fname);
 	$fname = str_replace(" ", "&nbsp;", $fname);
+	$pronouns = explode("/", $user['pronouns']);
 
 	$minipic = "";
 	if($showMinipic || Settings::get("alwaysMinipic"))
@@ -150,58 +151,26 @@ function userLink($user, $showMinipic = false, $customID = false)
 	$fname = $minipic.$fname;
 
 	if(!Settings::get("showGender"))
-		$fsex = 2;
+		$fcolor = 2;
 
 	if($fpow < 0) $fpow = -1;
-	$classing = " class=\"nc" . $fsex . (($fpow < 0) ? "x" : $fpow)."\"";
+	$classing = " class=\"nc" . $fcolor . (($fpow < 0) ? "x" : $fpow)."\"";
 
 	if ($customID)
 		$classing .= " id=\"$customID\"";
-
-/*
-	if($hacks['alwayssamepower'])
-		$fpow = $hacks['alwayssamepower'] - 1;
-	if($hacks['alwayssamesex'])
-		$fsex = $hacks['alwayssamesex'];
-
-	if($hacks['themenames'] == 1)
-	{
-		global $lastJokeNameColor;
-		$classing = " style=\"color: ";
-		if($lastJokeNameColor % 2 == 1)
-			$classing .= "#E16D6D; \"";
-		else
-			$classing .= "#44D04B; \"";
-		if($fpow == -1)
-			$classing = " class=\"nc0x\"";
-		$lastJokeNameColor++;
-	} else if($hacks['themenames'] == 2 && $fpow > -1)
-	{
-		$classing = " style =\"color: #".GetRainbowColor()."\"";
-	} else if($hacks['themenames'] == 3)
-	{
-		if($fpow > 2)
-		{
-			$fname = "Administration";
-			$classing = " class=\"nc23\"";
-		} else if($fpow == -1)
-		{
-			$fname = "Idiot";
-			$classing = " class=\"nc2x\"";
-		} else
-		{
-			$fname = "Anonymous";
-			$classing = " class=\"nc22\"";
-		}
-	}
-	*/
 
 	$bucket = "userLink"; include('lib/pluginloader.php');
 	if($user["powerlevel"])
 		$plstring = ", ".$powerlevels[$user['powerlevel']];
 	else
 		$plstring = "";
-	$title = "#".$user["id"].": ".htmlspecialchars($user['name']) . " (".$user["karma"].$plstring.")";
+
+	$pronounStr = "";
+	if (count($pronouns) == 5) {
+		$pronounStr = ", " . $pronouns[0] . "/" . $pronouns[1];
+	}
+
+	$title = "#".$user["id"].": ".htmlspecialchars($user['name']) . " (".$user["karma"].$plstring."".$pronounStr.")";
 	$userlink = actionLinkTag("<span$classing title=\"$title\">$fname</span>", "profile", $user["id"], "", $user["name"]);
 	return $userlink;
 }

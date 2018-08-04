@@ -54,12 +54,6 @@ function Plural($i, $s)
 	return $i." ".$s;
 }
 
-function HisHer($user)
-{
-	//Heh, this doesn't take plurals into account...
-	return "su";
-}
-
 function stringtotimestamp($str)
 {
 	global $months;

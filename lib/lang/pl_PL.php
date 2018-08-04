@@ -110,16 +110,6 @@ $wordto5=array(
 	return $i." ".$s;
 }
 
-function HisHer($user)
-{
-	// Why I bother with it, as software doesn't use this function EVEN once...
-	if($user['sex'] == 1)
-		return "jej";
-	return "jego"; // yes - Polish doesn't have "its" form (this is "her")
-				   // (you can try his dog and its dog on Google Translate)
-				   // (it's always on safer site to consider unknown gender to be male)
-}
-
 function stringtotimestamp($str)
 {
 	global $months;

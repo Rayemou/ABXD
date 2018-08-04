@@ -343,15 +343,18 @@ function getPowerlevelName($pl) {
 	return $powerlevels[$pl];
 }
 
-function getSexName($sex) {
-	$sexes = array(
-		0 => __("Male"),
-		1 => __("Female"),
-		2 => __("N/A"),
-	);
+$defaultPronouns = array(
+	"she/her/her/hers/herself" => __("she/her"),
+	"he/him/his/his/himself" => __("he/him"),
+	"they/them/their/theirs/themself" => __("they/them")
+);
 
-	return $sexes[$sex];
-}
+$defaultGenders = array(
+	"N/A" => __("N/A"),
+	"Female" => __("Female"),
+	"Male" => __("Male"),
+	"Non-binary" => __("Non-binary")
+);
 
 //TODO Add caching if it's too slow.
 function formatIP($ip)

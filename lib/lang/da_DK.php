@@ -50,11 +50,6 @@ function Plural($i, $s)
 	return $i." ".implode(" ", $s2);
 }
 
-function HisHer($user)
-{
-	return "sin";
-}
-
 function stringtotimestamp($str)
 {
 	global $months;

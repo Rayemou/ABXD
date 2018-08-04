@@ -183,13 +183,14 @@ function formatUser($userdata, $data, $option)
 	$id = $userdata["id"];
 	$possessive = $option=="s";
 
-	if($id == $me) return $possessive ? "your" : "you";
-	if($id == $lastuser)
-	{
-		if($userdata["sex"] == 1)
-			return $possessive ? "her" : "her";
-		else
-			return $possessive ? "his" : "him";
+	//if($id == $me) return $possessive ? "your" : "you";
+	if($id == $lastuser) {
+		if ($userdata['pronouns'] == "") {
+			return $possessive ? "their" : "they";
+		} else {
+			$pronouns = explode("/", $userdata['pronouns']);
+			return $possessive ? $pronouns[2] : $pronouns[0];
+		}
 	}
 	else $lastuser = $id;
 		
