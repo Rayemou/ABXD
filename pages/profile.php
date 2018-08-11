@@ -128,7 +128,7 @@ $foo = array();
 $foo[__("Name")] = $minipic . htmlspecialchars($user['displayname'] ? $user['displayname']." (".$user['name'].")" : $user['name']);
 $foo[__("Power")] = getPowerlevelName($user['powerlevel']);
 if ($user['gender'] != "N/A") {
-	$foo[__("Gender")] = $user['gender'];
+	$foo[__("Gender")] = htmlspecialchars($user['gender']);
 }
 if ($user['pronouns'] != "") {
 	$pronouns = explode("/", $user['pronouns']);

@@ -653,9 +653,9 @@ function handlePronouns($field, $item) {
 	if ($_POST[$field] == "custom") {
 		for ($i = 0; $i < 5; $i++) {
 			if (trim($_POST[$field . "_" . $i]) == "")
-				return "You must fill out all the fields for pronouns.";
-			else if (strpos($_POST[$field."_".$i], '/') !== false)
-				return "You can not use slashes in your pronouns.";
+				return __("You must fill out all the fields for pronouns.");
+			else if (!preg_match("/^\p{L}+$/ui", $_POST[$field."_".$i]))
+				return __("You can't use special characters in your pronouns.");
 		}
 	} else if ($_POST[$field] != "N/A" && !array_key_exists($_POST[$field], $defaultPronouns)) {
 		return "Did you mean to select custom pronouns?";
@@ -1165,8 +1165,9 @@ function BuildPage($page, $id)
 					}
 					$isDefault = array_key_exists(trim($item['value']), $defaultGenders); 
 					$output .= format(
-						'<br /><label><input type="radio" name="{0}" value="Custom" {1}/>Other</label> <input type="text" name="{0}_custom" value="{2}" size="32" />',
-						$field, $isDefault ? "" : "checked=\"checked\" ", $isDefault ? "" : $item['value']
+						'<br /><label><input type="radio" name="{0}" value="Custom" {1}/>Other</label>
+						<input type="text" name="{0}_custom" value="{2}" size="32" />',
+						$field, $isDefault ? "" : "checked=\"checked\" ", $isDefault ? "" : htmlspecialchars($item['value'])
 					);
 					break;
 
@@ -1198,7 +1199,7 @@ function BuildPage($page, $id)
 					foreach ($example as $i => $ex) {
 						$output .= format(
 							'<input type="text" name="{0}_{1}" size="5" placeholder="{2}" value="{3}" />',
-							$field, $i, $ex, $_POST[$field . "_" . $i] ? $_POST[$field . "_" . $i] : $pronouns[$i]
+							$field, $i, $ex, $_POST[$field . "_" . $i] ? htmlspecialchars($_POST[$field . "_" . $i]) : htmlspecialchars($pronouns[$i])
 						);
 						if ($i != count($example) - 1)
 							$output .= "/";
