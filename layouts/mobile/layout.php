@@ -3,7 +3,31 @@
 
 <head>
 	<title><?php print $layout_title?></title>
+	<script>
+    (function(document,navigator,standalone) {
+        // prevents links from apps from oppening in mobile safari
+        // this javascript must be the first script in your <head>
+        if ((standalone in navigator) && navigator[standalone]) {
+            var curnode, location=document.location, stop=/^(a|html)$/i;
+            document.addEventListener('click', function(e) {
+                curnode=e.target;
+                while (!(stop).test(curnode.nodeName)) {
+                    curnode=curnode.parentNode;
+                }
+                // Conditions to do this only on links to your own app
+                // if you want all links, use if('href' in curnode) instead.
+                if('href' in curnode && ( curnode.href.indexOf('http') || ~curnode.href.indexOf(location.host) ) ) {
+                    e.preventDefault();
+                    location.href = curnode.href;
+                }
+            },false);
+        }
+    })(document,window.navigator,'standalone');
+</script>
 	<?php include("header.php"); ?>
+	<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+	<meta name="viewport" content="user-scalable=no, initial-scale=1.0, width=device-width" />
 	<meta name="viewport" content="user-scalable=no, initial-scale=1.0, width=device-width" />
 </head>
 
